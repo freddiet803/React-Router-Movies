@@ -1,36 +1,43 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import MovieCard from './MovieCard.js';
 
 const Movie = (props) => {
   const [movie, setMovie] = useState({});
- 
+  const [stars, setStars] = useState([]);
+  //console.log('Hey' + props.match.params.id);
   useEffect(() => {
-    const id = 1;
+    const id = props.match.params.id;
+    //console.log('HEeeeeey ' + `${id}`);
     // change ^^^ that line and grab the id from the URL
     // You will NEED to add a dependency array to this effect hook
 
-       axios
-        .get(`http://localhost:5000/api/movies/${id}`)
-        .then(response => {
-          setMovie(response.data);
-        })
-        .catch(error => {
-          console.error(error);
-        });
+    axios
+      .get(`http://localhost:5000/api/movies/${id}`)
+      .then(response => {
+        setMovie(response.data);
+        setStars(response.data.stars);
+        console.log(response.data);
+        //console.log(response.data.stars);
+      })
+      .catch(error => {
+        console.error(error);
+      });
 
-  },[]);
-  
-  // Uncomment this only when you have moved on to the stretch goals
-  // const saveMovie = () => {
-  //   const addToSavedList = props.addToSavedList;
-  //   addToSavedList(movie)
-  // }
+  }, [props.match.params.id]);
+
+  //Uncomment this only when you have moved on to the stretch goals
+  const saveMovie = () => {
+    const addToSavedList = props.addSaved;
+    addToSavedList(movie)
+  }
 
   if (!movie) {
     return <div>Loading movie information...</div>;
   }
 
-  const { title, director, metascore, stars } = movie;
+  const { title, director, metascore } = movie;
+  //console.log({ stars });
   return (
     <div className="save-wrapper">
       <div className="movie-card">
@@ -43,14 +50,17 @@ const Movie = (props) => {
         </div>
         <h3>Actors</h3>
 
-        {stars.map(star => (
-          <div key={star} className="movie-star">
-            {star}
-          </div>
-        ))}
+        {
+          stars.map(star => (
+            <div key={star} className="movie-star">
+              {star}
+            </div>
+          ))
+        }
       </div>
-      <div className="save-button">Save</div>
+      <div className="save-button" onClick={() => saveMovie()}>Save</div>
     </div>
+
   );
 }
 
